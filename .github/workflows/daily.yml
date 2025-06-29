@@ -11,7 +11,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: false # 🔑 Fallback token iptal!
+          persist-credentials: false # 🔑 fallback token kapalı
 
       - name: Debug REPO
         env:
@@ -29,7 +29,7 @@ jobs:
       - name: Hardcoded token push test
         env:
           REPO: ${{ github.repository }}
-          PAT: ${{ secrets.PAT }}  # ✅ Secret panelde sadece ghp_...
+          PAT: ${{ secrets.PAT }}
         run: |
           echo "=== HARD TEST ==="
           echo "https://x-access-token:${PAT}@github.com/${REPO}.git"
@@ -46,9 +46,27 @@ jobs:
 
           git remote remove origin || true
 
-          # ✅ Prefix sabit, sadece ghp_... birleşir
           git remote add secure "https://x-access-token:${PAT}@github.com/${REPO}.git"
-
           git remote -v
 
           git push --force secure gh-pages
+
+      - name: Create auto-tag
+        env:
+          REPO: ${{ github.repository }}
+          PAT: ${{ secrets.PAT }}
+        run: |
+          DATE_TAG="v$(date +'%Y%m%d')"
+          echo "=== TAG ==="
+          echo $DATE_TAG
+
+          git tag $DATE_TAG
+          git push secure $DATE_TAG
+
+      - name: Comment on commit
+        uses: peter-evans/commit-comment@v3
+        with:
+          token: ${{ secrets.PAT }}
+          body: |
+            ✅ Daily Report pushed to **gh-pages**
+            🏷️ New tag created: `${{ steps.create-tag.outputs.date_tag }}`
