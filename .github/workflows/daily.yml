@@ -21,10 +21,17 @@ jobs:
 
       - name: Commit report to gh-pages
         env:
-          PAT: ${{ secrets.PAT }}
+          PAT: ${{ secrets.PAT }}   # 👈 Repo Settings → Secrets'ta PAT ismiyle ekledin ya, tam buraya
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git checkout --orphan gh-pages
           git rm -rf .
+          mv report.csv index.csv
+
+          git add index.csv
+          git commit -m "Daily report update"
+
+          # 👇 EN KRİTİK: PAT Secret'ı push URL'sine gömülü
+          git push --force https://${PAT}@github.com/${{ github.repository }} gh-pages
