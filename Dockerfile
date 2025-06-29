@@ -1,10 +1,15 @@
-FROM python:3.12-slim
+# Temel imaj
+FROM python:3.11-slim
 
+# Çalışma dizini
 WORKDIR /app
 
-COPY report.py .
+# Tüm dosyaları konteynere kopyala
+COPY . .
 
-# Bu satıra GEREK YOK:
-# RUN pip install --no-cache-dir
+# Gerekiyorsa bağımlılıkları yükle
+# requirements.txt yoksa bu satırı kaldır veya pip install kısmını ekle
+RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; fi
 
+# Konteyner başladığında ne çalışacak
 CMD ["python", "report.py"]
