@@ -1,40 +1,18 @@
-name: Daily Report
+- name: Commit report to gh-pages
+  env:
+    PAT: ${{ secrets.PAT }}
+  run: |
+    git config --global user.name "actions-bot"
+    git config --global user.email "actions-bot@example.com"
 
-on:
-  schedule:
-    - cron: '0 5 * * *'
-  workflow_dispatch:
+    git checkout --orphan gh-pages
+    git rm -rf .
+    mv report.csv index.csv
 
-jobs:
-  build-run-deploy:
-    runs-on: ubuntu-latest
+    git add index.csv
+    git commit -m "Daily report update"
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    git remote remove origin
+    git remote add origin https://$PAT@github.com/${{ github.repository }}.git
 
-      - name: Build Docker image
-        run: docker build -t daily-report .
-
-      - name: Run container
-        run: docker run -v ${{ github.workspace }}:/app daily-report
-
-      - name: Commit report to gh-pages
-        env:
-          PAT: ${{ secrets.PAT }}
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git checkout --orphan gh-pages
-          git rm -rf .
-          mv report.csv index.csv
-
-          git add index.csv
-          git commit -m "Daily report update"
-
-          # 🔑 Burada remote'u önce sil, sonra PAT'li URL ile tanımla
-          git remote remove origin
-          git remote add origin https://$PAT@github.com/${{ github.repository }}.git
-
-          git push --force origin gh-pages
+    git push --force origin gh-pages
