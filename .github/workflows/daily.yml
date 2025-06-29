@@ -2,7 +2,7 @@ name: Daily Report
 
 on:
   schedule:
-    - cron: '0 5 * * *'   # Her sabah UTC 05:00 → Türkiye saatiyle 08:00
+    - cron: '0 5 * * *'
   workflow_dispatch:
 
 jobs:
@@ -13,7 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # ✅ PAT debug
       - name: Debug PAT
         env:
           PAT: ${{ secrets.PAT }}
@@ -21,7 +20,6 @@ jobs:
           echo "=== PAT uzunluğu ==="
           echo "$PAT" | wc -c
 
-      # ✅ REPO debug
       - name: Debug REPO
         env:
           REPO: ${{ github.repository }}
@@ -54,9 +52,8 @@ jobs:
           echo "=== Remote URL ==="
           echo "https://x-access-token:$PAT@github.com/$REPO.git"
 
-          # 🔑 Remote'u x-access-token formatıyla override et
-          git remote remove origin || true
-          git remote add origin https://x-access-token:$PAT@github.com/$REPO.git
+          # ✅ Remote'u yeni isimle ekle
+          git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
 
-          # 🔑 Doğru push
-          git push --force origin gh-pages
+          # ✅ Doğrudan secure remote'a push
+          git push --force secure gh-pages
