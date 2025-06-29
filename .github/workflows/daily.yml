@@ -54,5 +54,5 @@ jobs:
 
           git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
 
-          # ⚡️ ÇOK ÖNEMLİ: DOĞRUDAN secure remote’a push
+          # 🔑 🔑 🔑 EN KRİTİK:
           git push --force secure gh-pages
