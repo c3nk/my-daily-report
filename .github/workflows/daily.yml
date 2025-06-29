@@ -2,7 +2,7 @@ name: Daily Report
 
 on:
   schedule:
-    - cron: '0 5 * * *'   # UTC 05:00 → Türkiye için 08:00
+    - cron: '0 5 * * *'   # Her sabah UTC 05:00 → Türkiye saatiyle 08:00
   workflow_dispatch:
 
 jobs:
@@ -20,6 +20,8 @@ jobs:
         run: docker run -v ${{ github.workspace }}:/app daily-report
 
       - name: Commit report to gh-pages
+        env:
+          PAT: ${{ secrets.PAT }}   # Burada Secret adını PAT yaptık!
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -30,4 +32,4 @@ jobs:
 
           git add index.csv
           git commit -m "Daily report update"
-          git push --force origin gh-pages
+          git push --force https://${PAT}@github.com/${{ github.repository }} gh-pages
