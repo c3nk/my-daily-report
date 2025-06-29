@@ -46,32 +46,20 @@ jobs:
           git add index.csv
           git commit -m "Daily report update"
 
-      # ✅ ✅ ✅ HARD PREFIX ECHO TEST ✅ ✅ ✅
-      - name: Hard prefix echo test
+      # ✅ ✅ ✅ HARD PREFIX ECHO & SECURE PUSH ✅ ✅ ✅
+      - name: Hard prefix echo & final secure push test
         env:
           PAT: ${{ secrets.PAT }}
           REPO: ${{ github.repository }}
         run: |
-          echo "=== HARD PREFIX TEST ==="
-          echo "https://x-access-token:$PAT@github.com/$REPO.git"
+          echo "=== HARD TEST ==="
+          echo "https://x-access-token:${PAT}@github.com/${REPO}.git"
 
-      # ✅ ✅ ✅ FINAL MINIMAL SECURE PUSH TEST ✅ ✅ ✅
-      - name: Final minimal secure push test
-        env:
-          PAT: ${{ secrets.PAT }}
-          REPO: ${{ github.repository }}
-        run: |
-          echo "=== Remote URL ==="
-          echo "https://x-access-token:$PAT@github.com/$REPO.git"
-
-          # 🔑 Origin'u sil — fallback yok
           git remote remove origin || true
 
-          # 🔑 Secure remote'u _KESİN_ prefix'le ekle
-          git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
+          # 🔑 Çift tırnaklı, prefix sabit
+          git remote add secure "https://x-access-token:${PAT}@github.com/${REPO}.git"
 
-          # 🔑 Remote listesi — log'da prefix çıkmalı, sadece PAT maskelenir
           git remote -v
 
-          # 🔑 Sadece secure remote'a push et
           git push --force secure gh-pages
