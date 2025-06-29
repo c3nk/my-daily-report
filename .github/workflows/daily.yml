@@ -1,27 +1,64 @@
-- name: Commit report to gh-pages
-  env:
-    PAT: ${{ secrets.PAT }}
-    REPO: ${{ github.repository }}
-  run: |
-    git config --global user.name "actions-bot"
-    git config --global user.email "actions-bot@example.com"
+name: Daily Report
 
-    git checkout --orphan gh-pages
-    git rm -rf . || true
+on:
+  schedule:
+    - cron: '0 5 * * *'   # Her sabah UTC 05:00 → Türkiye saatiyle 08:00
+  workflow_dispatch:
 
-    mv report.csv index.csv
+jobs:
+  build-run-deploy:
+    runs-on: ubuntu-latest
 
-    git add index.csv
-    git commit -m "Daily report update"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    echo "=== Remote URL ==="
-    echo "https://x-access-token:$PAT@github.com/$REPO.git"
+      # ✅ PAT debug
+      - name: Debug PAT
+        env:
+          PAT: ${{ secrets.PAT }}
+        run: |
+          echo "=== PAT uzunluğu ==="
+          echo "$PAT" | wc -c
 
-    # ✅ Origin'u bile sil
-    git remote remove origin || true
+      # ✅ REPO debug
+      - name: Debug REPO
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          echo "=== REPO ==="
+          echo "$REPO"
 
-    # ✅ Secure remote ekle
-    git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
+      - name: Build Docker image
+        run: docker build -t daily-report .
 
-    # ✅ Sadece secure remote'a push
-    git push --force secure gh-pages
+      - name: Run container
+        run: docker run -v ${{ github.workspace }}:/app daily-report
+
+      - name: Commit report to gh-pages
+        env:
+          PAT: ${{ secrets.PAT }}
+          REPO: ${{ github.repository }}
+        run: |
+          git config --global user.name "actions-bot"
+          git config --global user.email "actions-bot@example.com"
+
+          git checkout --orphan gh-pages
+          git rm -rf . || true
+
+          mv report.csv index.csv
+
+          git add index.csv
+          git commit -m "Daily report update"
+
+          echo "=== Remote URL ==="
+          echo "https://x-access-token:$PAT@github.com/$REPO.git"
+
+          # ✅ Origin'u SİL — fallback olmasın!
+          git remote remove origin || true
+
+          # ✅ Secure remote ekle
+          git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
+
+          # ✅ Sadece secure remote’a push
+          git push --force secure gh-pages
