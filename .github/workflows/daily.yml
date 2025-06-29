@@ -52,7 +52,8 @@ jobs:
           echo "=== Remote URL ==="
           echo "https://x-access-token:$PAT@github.com/$REPO.git"
 
+          # ✅ Remote'u yeni isimle ekle
           git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
 
-          # 🔑🔑🔑 Sadece secure remote’a push!
+          # ✅ DİKKAT: Secure remote’a push
           git push --force secure gh-pages
