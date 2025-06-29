@@ -11,7 +11,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: false # 🔑 Fallback token kapalı
+          persist-credentials: false # Fallback token devre dışı
 
       - name: Debug REPO
         env:
@@ -40,9 +40,14 @@ jobs:
           git checkout --orphan gh-pages
           git rm -rf . || true
 
-          echo "hello, this is test file" > index.csv
-          git add index.csv
-          git commit -m "Daily Report push"
+          DATE=$(date +'%Y-%m-%d')
+          REPORT_FILE="report_${DATE}.csv"
+
+          echo "Checking file exists:"
+          ls -la $REPORT_FILE
+
+          git add $REPORT_FILE
+          git commit -m "Daily Report push for $DATE" || echo "Nothing to commit"
 
           git remote remove origin || true
           git remote add secure "https://x-access-token:${PAT}@github.com/${REPO}.git"
@@ -59,8 +64,5 @@ jobs:
           echo "=== TAG ==="
           echo $DATE_TAG
 
-          # Localde tag overwrite et
           git tag -f $DATE_TAG
-
-          # Remote'a force push et
           git push --force secure $DATE_TAG
