@@ -2,7 +2,7 @@ name: Daily Report
 
 on:
   schedule:
-    - cron: '0 5 * * *'   # Her sabah UTC 05:00 → Türkiye saatiyle 08:00
+    - cron: '0 5 * * *'
   workflow_dispatch:
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
 
       - name: Commit report to gh-pages
         env:
-          PAT: ${{ secrets.PAT }}   # 👈 Repo Settings → Secrets'ta PAT ismiyle ekledin ya, tam buraya
+          PAT: ${{ secrets.PAT }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -33,5 +33,5 @@ jobs:
           git add index.csv
           git commit -m "Daily report update"
 
-          # 👇 EN KRİTİK: PAT Secret'ı push URL'sine gömülü
-          git push --force https://${PAT}@github.com/${{ github.repository }} gh-pages
+          # 👇 Burada ${PAT} değil, **$PAT**
+          git push --force https://$PAT@github.com/${{ github.repository }} gh-pages
