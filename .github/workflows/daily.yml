@@ -11,7 +11,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: false # 🔑 fallback token kapalı
+          persist-credentials: false # 🔑 Fallback token kapalı
 
       - name: Debug REPO
         env:
@@ -26,13 +26,13 @@ jobs:
       - name: Run container
         run: docker run -v ${{ github.workspace }}:/app daily-report
 
-      - name: Hardcoded token push test
+      - name: Commit & Force Push gh-pages
         env:
           REPO: ${{ github.repository }}
           PAT: ${{ secrets.PAT }}
         run: |
-          echo "=== HARD TEST ==="
-          echo "https://x-access-token:${PAT}@github.com/${REPO}.git"
+          echo "=== PUSH TEST ==="
+          echo "Remote: https://x-access-token:${PAT}@github.com/${REPO}.git"
 
           git config --global user.name "actions-bot"
           git config --global user.email "actions-bot@example.com"
@@ -42,16 +42,15 @@ jobs:
 
           echo "hello, this is test file" > index.csv
           git add index.csv
-          git commit -m "Hardcoded push test"
+          git commit -m "Daily Report push"
 
           git remote remove origin || true
-
           git remote add secure "https://x-access-token:${PAT}@github.com/${REPO}.git"
-          git remote -v
 
+          git remote -v
           git push --force secure gh-pages
 
-      - name: Create auto-tag
+      - name: Create & Force Push Daily Tag
         env:
           REPO: ${{ github.repository }}
           PAT: ${{ secrets.PAT }}
@@ -60,13 +59,8 @@ jobs:
           echo "=== TAG ==="
           echo $DATE_TAG
 
-          git tag $DATE_TAG
-          git push secure $DATE_TAG
+          # Localde tag overwrite et
+          git tag -f $DATE_TAG
 
-      - name: Comment on commit
-        uses: peter-evans/commit-comment@v3
-        with:
-          token: ${{ secrets.PAT }}
-          body: |
-            ✅ Daily Report pushed to **gh-pages**
-            🏷️ New tag created: `${{ steps.create-tag.outputs.date_tag }}`
+          # Remote'a force push et
+          git push --force secure $DATE_TAG
