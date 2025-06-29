@@ -2,7 +2,7 @@ name: Daily Report
 
 on:
   schedule:
-    - cron: '0 5 * * *'   # Her sabah UTC 05:00 → Türkiye saatiyle 08:00
+    - cron: '0 5 * * *'
   workflow_dispatch:
 
 jobs:
@@ -23,21 +23,19 @@ jobs:
         env:
           PAT: ${{ secrets.PAT }}
         run: |
-          # Git user ayarı
           git config --global user.name "actions-bot"
           git config --global user.email "actions-bot@example.com"
 
-          # Yeni branch + önceki dosyaları sil
           git checkout --orphan gh-pages
           git rm -rf .
 
-          # Raporu index.csv olarak taşı
           mv report.csv index.csv
 
-          # Commit hazırla
           git add index.csv
           git commit -m "Daily report update"
 
-          # PAT ile remote ayarla ve push et
-          git remote remove origin
-          git remote add origin https://$
+          # 🔑 Remote'u PAT ile ayarla!
+          git remote set-url origin https://$PAT@github.com/${{ github.repository }}.git
+
+          # 🔑 PAT kullanarak push
+          git push --force origin gh-pages
