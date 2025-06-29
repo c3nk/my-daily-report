@@ -20,17 +20,20 @@ jobs:
         run: docker run -v ${{ github.workspace }}:/app daily-report
 
       - name: Commit report to gh-pages
-        env:
-          PAT: ${{ secrets.PAT }}
-        run: |
-          git config --global user.name "actions-bot"
-          git config --global user.email "actions-bot@example.com"
+  env:
+    PAT: ${{ secrets.PAT }}
+  run: |
+    git config --global user.name "actions-bot"
+    git config --global user.email "actions-bot@example.com"
 
-          git checkout --orphan gh-pages
-          git rm -rf .
-          mv report.csv index.csv
+    git checkout --orphan gh-pages
+    git rm -rf .
+    mv report.csv index.csv
 
-          git add index.csv
-          git commit -m "Daily report update"
+    git add index.csv
+    git commit -m "Daily report update"
 
-          # R
+    git remote remove origin
+    git remote add origin https://$PAT@github.com/${{ github.repository }}.git
+
+    git push --force origin gh-pages
