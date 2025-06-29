@@ -55,14 +55,14 @@ jobs:
           echo "=== Remote URL ==="
           echo "https://x-access-token:$PAT@github.com/$REPO.git"
 
-          # ✅ Origin'u sil
+          # ✅ Origin'u sil — fallback yok
           git remote remove origin || true
 
-          # ✅ Secure remote'u DOĞRU FORMATLA ekle — ZORUNLU!
+          # ✅ Secure remote'u _KESİN_ prefix ile ekle
           git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
 
-          # ✅ Tüm remote'ları listele — log'da prefix çıkmalı
+          # ✅ Tüm remote'ları listele — prefix maskede açık çıkar
           git remote -v
 
-          # ✅ Sadece secure remote'a push et
+          # ✅ _Sadece_ secure remote'a push
           git push --force secure gh-pages
