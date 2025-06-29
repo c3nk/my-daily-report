@@ -1,0 +1,33 @@
+name: Daily Report
+
+on:
+  schedule:
+    - cron: '0 5 * * *'   # UTC 05:00 → Türkiye için 08:00
+  workflow_dispatch:
+
+jobs:
+  build-run-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build -t daily-report .
+
+      - name: Run container
+        run: docker run -v ${{ github.workspace }}:/app daily-report
+
+      - name: Commit report to gh-pages
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git checkout --orphan gh-pages
+          git rm -rf .
+          mv report.csv index.csv
+
+          git add index.csv
+          git commit -m "Daily report update"
+          git push --force origin gh-pages
