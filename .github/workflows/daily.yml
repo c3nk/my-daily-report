@@ -2,7 +2,7 @@ name: Daily Report
 
 on:
   schedule:
-    - cron: '0 5 * * *'
+    - cron: '0 5 * * *'   # Her sabah UTC 05:00 → Türkiye saatiyle 08:00
   workflow_dispatch:
 
 jobs:
@@ -34,9 +34,6 @@ jobs:
         run: docker run -v ${{ github.workspace }}:/app daily-report
 
       - name: Commit report to gh-pages
-        env:
-          PAT: ${{ secrets.PAT }}
-          REPO: ${{ github.repository }}
         run: |
           git config --global user.name "actions-bot"
           git config --global user.email "actions-bot@example.com"
@@ -49,23 +46,23 @@ jobs:
           git add index.csv
           git commit -m "Daily report update"
 
-          echo "=== Remote URL ==="
-          echo "https://x-access-token:$PAT@github.com/$REPO.git"
-
-          git remote remove origin || true
-
-          git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
-
-          # 🔑 🔑 🔑 🔑 🔑 🔑
-
-                - name: Final minimal secure push test
+      # ✅ ✅ ✅ FINAL MINIMAL PUSH TEST ✅ ✅ ✅
+      - name: Final minimal secure push test
         env:
           PAT: ${{ secrets.PAT }}
           REPO: ${{ github.repository }}
         run: |
-          git remote remove origin || true
-          git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
-          git remote -v
-          git push --force secure gh-pages
+          echo "=== Remote URL ==="
+          echo "https://x-access-token:$PAT@github.com/$REPO.git"
 
+          # 🔑 Origin'u sil
+          git remote remove origin || true
+
+          # 🔑 Secure remote ekle
+          git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
+
+          # 🔑 Tüm remote'ları listele
+          git remote -v
+
+          # 🔑 Sadece secure remote'a push
           git push --force secure gh-pages
