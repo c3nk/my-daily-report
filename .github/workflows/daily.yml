@@ -9,7 +9,9 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false # 🔑 Fallback token iptal!
 
       - name: Debug REPO
         env:
@@ -27,12 +29,10 @@ jobs:
       - name: Hardcoded token push test
         env:
           REPO: ${{ github.repository }}
+          PAT: ${{ secrets.PAT }}  # ✅ Secret panelde sadece ghp_...
         run: |
-          # ✅ BURAYA kendi token'ını birebir YAPIŞTIR
-          HARDCODE_PAT="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"
-
           echo "=== HARD TEST ==="
-          echo "https://x-access-token:${HARDCODE_PAT}@github.com/${REPO}.git"
+          echo "https://x-access-token:${PAT}@github.com/${REPO}.git"
 
           git config --global user.name "actions-bot"
           git config --global user.email "actions-bot@example.com"
@@ -46,8 +46,8 @@ jobs:
 
           git remote remove origin || true
 
-          # 🔑 Çift tırnak, prefix sabit
-          git remote add secure "https://x-access-token:${HARDCODE_PAT}@github.com/${REPO}.git"
+          # ✅ Prefix sabit, sadece ghp_... birleşir
+          git remote add secure "https://x-access-token:${PAT}@github.com/${REPO}.git"
 
           git remote -v
 
