@@ -1,59 +1,27 @@
-name: Daily Report
+- name: Commit report to gh-pages
+  env:
+    PAT: ${{ secrets.PAT }}
+    REPO: ${{ github.repository }}
+  run: |
+    git config --global user.name "actions-bot"
+    git config --global user.email "actions-bot@example.com"
 
-on:
-  schedule:
-    - cron: '0 5 * * *'
-  workflow_dispatch:
+    git checkout --orphan gh-pages
+    git rm -rf . || true
 
-jobs:
-  build-run-deploy:
-    runs-on: ubuntu-latest
+    mv report.csv index.csv
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    git add index.csv
+    git commit -m "Daily report update"
 
-      - name: Debug PAT
-        env:
-          PAT: ${{ secrets.PAT }}
-        run: |
-          echo "=== PAT uzunluğu ==="
-          echo "$PAT" | wc -c
+    echo "=== Remote URL ==="
+    echo "https://x-access-token:$PAT@github.com/$REPO.git"
 
-      - name: Debug REPO
-        env:
-          REPO: ${{ github.repository }}
-        run: |
-          echo "=== REPO ==="
-          echo "$REPO"
+    # ✅ Origin'u bile sil
+    git remote remove origin || true
 
-      - name: Build Docker image
-        run: docker build -t daily-report .
+    # ✅ Secure remote ekle
+    git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
 
-      - name: Run container
-        run: docker run -v ${{ github.workspace }}:/app daily-report
-
-      - name: Commit report to gh-pages
-        env:
-          PAT: ${{ secrets.PAT }}
-          REPO: ${{ github.repository }}
-        run: |
-          git config --global user.name "actions-bot"
-          git config --global user.email "actions-bot@example.com"
-
-          git checkout --orphan gh-pages
-          git rm -rf . || true
-
-          mv report.csv index.csv
-
-          git add index.csv
-          git commit -m "Daily report update"
-
-          echo "=== Remote URL ==="
-          echo "https://x-access-token:$PAT@github.com/$REPO.git"
-
-          # ✅ Remote'u yeni isimle ekle
-          git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
-
-          # ✅ DİKKAT: Secure remote’a push
-          git push --force secure gh-pages
+    # ✅ Sadece secure remote'a push
+    git push --force secure gh-pages
