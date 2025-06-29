@@ -1,7 +1,9 @@
 name: Daily Report
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:      # Manuel
+  schedule:               # Otomatik
+    - cron: '0 4 * * *'   # Her gün 04:00 UTC
 
 jobs:
   build-run-deploy:
