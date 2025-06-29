@@ -46,23 +46,18 @@ jobs:
           git add index.csv
           git commit -m "Daily report update"
 
-      # ✅ ✅ ✅ FINAL MINIMAL PUSH TEST ✅ ✅ ✅
-      - name: Final minimal secure push test
-        env:
-          PAT: ${{ secrets.PAT }}
-          REPO: ${{ github.repository }}
-        run: |
-          echo "=== Remote URL ==="
-          echo "https://x-access-token:$PAT@github.com/$REPO.git"
+- name: Final minimal secure push test
+  env:
+    PAT: ${{ secrets.PAT }}
+    REPO: ${{ github.repository }}
+  run: |
+    echo "=== Remote URL ==="
+    echo "https://x-access-token:$PAT@github.com/$REPO.git"
 
-          # 🔑 Origin'u sil
-          git remote remove origin || true
+    git remote remove origin || true
 
-          # 🔑 Secure remote ekle
-          git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
+    git remote add secure https://x-access-token:$PAT@github.com/$REPO.git
 
-          # 🔑 Tüm remote'ları listele
-          git remote -v
+    git remote -v
 
-          # 🔑 Sadece secure remote'a push
-          git push --force secure gh-pages
+    git push --force secure gh-pages
