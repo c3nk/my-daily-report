@@ -21,15 +21,10 @@ jobs:
 
       - name: Commit report to gh-pages
         env:
-          PAT: ${{ secrets.PAT }}   # Burada Secret adını PAT yaptık!
+          PAT: ${{ secrets.PAT }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git checkout --orphan gh-pages
           git rm -rf .
-          mv report.csv index.csv
-
-          git add index.csv
-          git commit -m "Daily report update"
-          git push --force https://${PAT}@github.com/${{ github.repository }} gh-pages
