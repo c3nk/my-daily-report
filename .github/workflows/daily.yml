@@ -2,7 +2,7 @@ name: Daily Report
 
 on:
   schedule:
-    - cron: '0 5 * * *'
+    - cron: '0 5 * * *'   # Her sabah UTC 05:00 → Türkiye saatiyle 08:00
   workflow_dispatch:
 
 jobs:
@@ -13,12 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-- name: Debug echo
-  env:
-    PAT: ${{ secrets.PAT }}
-  run: |
-    echo "PAT var mi?"
-    echo "$PAT" | wc -c        
+      # ✅ PAT debug: Secret doğru mu hemen kontrol!
+      - name: Debug PAT
+        env:
+          PAT: ${{ secrets.PAT }}
+        run: |
+          echo "=== PAT uzunluğu ==="
+          echo "$PAT" | wc -c
 
       - name: Build Docker image
         run: docker build -t daily-report .
@@ -35,14 +36,3 @@ jobs:
 
           git checkout --orphan gh-pages
           git rm -rf .
-
-          mv report.csv index.csv
-
-          git add index.csv
-          git commit -m "Daily report update"
-
-          # 🔑 Remote'u PAT ile ayarla!
-          git remote set-url origin https://$PAT@github.com/${{ github.repository }}.git
-
-          # 🔑 PAT kullanarak push
-          git push --force origin gh-pages
