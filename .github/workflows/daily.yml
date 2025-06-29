@@ -1,8 +1,6 @@
 name: Daily Report
 
 on:
-  schedule:
-    - cron: '0 5 * * *'   # Her sabah UTC 05:00 → Türkiye saatiyle 08:00
   workflow_dispatch:
 
 jobs:
@@ -12,13 +10,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Debug PAT
-        env:
-          PAT: ${{ secrets.PAT }}
-        run: |
-          echo "=== PAT uzunluğu ==="
-          echo "$PAT" | wc -c
 
       - name: Debug REPO
         env:
@@ -33,32 +24,30 @@ jobs:
       - name: Run container
         run: docker run -v ${{ github.workspace }}:/app daily-report
 
-      - name: Commit report to gh-pages
+      - name: Hardcoded token push test
+        env:
+          REPO: ${{ github.repository }}
         run: |
+          # ✅ BURAYA kendi token'ını birebir YAPIŞTIR
+          HARDCODE_PAT="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"
+
+          echo "=== HARD TEST ==="
+          echo "https://x-access-token:${HARDCODE_PAT}@github.com/${REPO}.git"
+
           git config --global user.name "actions-bot"
           git config --global user.email "actions-bot@example.com"
 
           git checkout --orphan gh-pages
           git rm -rf . || true
 
-          mv report.csv index.csv
-
+          echo "hello, this is test file" > index.csv
           git add index.csv
-          git commit -m "Daily report update"
-
-      # ✅ ✅ ✅ HARD PREFIX ECHO & SECURE PUSH ✅ ✅ ✅
-      - name: Hard prefix echo & final secure push test
-        env:
-          PAT: ${{ secrets.PAT }}
-          REPO: ${{ github.repository }}
-        run: |
-          echo "=== HARD TEST ==="
-          echo "https://x-access-token:${PAT}@github.com/${REPO}.git"
+          git commit -m "Hardcoded push test"
 
           git remote remove origin || true
 
-          # 🔑 Çift tırnaklı, prefix sabit
-          git remote add secure "https://x-access-token:${PAT}@github.com/${REPO}.git"
+          # 🔑 Çift tırnak, prefix sabit
+          git remote add secure "https://x-access-token:${HARDCODE_PAT}@github.com/${REPO}.git"
 
           git remote -v
 
