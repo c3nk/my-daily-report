@@ -13,6 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+- name: Debug echo
+  env:
+    PAT: ${{ secrets.PAT }}
+  run: |
+    echo "PAT var mi?"
+    echo "$PAT" | wc -c        
+
       - name: Build Docker image
         run: docker build -t daily-report .
 
