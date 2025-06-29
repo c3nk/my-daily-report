@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # ✅ PAT Debug: Secret var mı hemen gör
+      # ✅ PAT debug
       - name: Debug PAT
         env:
           PAT: ${{ secrets.PAT }}
@@ -21,7 +21,7 @@ jobs:
           echo "=== PAT uzunluğu ==="
           echo "$PAT" | wc -c
 
-      # ✅ REPO Debug: github.repository değeri
+      # ✅ REPO debug
       - name: Debug REPO
         env:
           REPO: ${{ github.repository }}
@@ -43,24 +43,18 @@ jobs:
           git config --global user.name "actions-bot"
           git config --global user.email "actions-bot@example.com"
 
-          # Yeni gh-pages branch
           git checkout --orphan gh-pages
-
-          # Dosyaları sil, .git kalır
           git rm -rf . || true
 
-          # Report dosyasını taşı
           mv report.csv index.csv
 
           git add index.csv
           git commit -m "Daily report update"
 
           echo "=== Remote URL ==="
-          echo "https://$PAT@github.com/$REPO.git"
+          echo "https://x-access-token:$PAT@github.com/$REPO.git"
 
-          # Remote URL'yi PAT ile güncelle
-          git remote remove origin
-          git remote add origin https://$PAT@github.com/$REPO.git
+          git remote remove origin || true
+          git remote add origin https://x-access-token:$PAT@github.com/$REPO.git
 
-          # PAT ile push
           git push --force origin gh-pages
