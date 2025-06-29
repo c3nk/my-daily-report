@@ -54,7 +54,7 @@ jobs:
           echo "=== Remote URL ==="
           echo "https://x-access-token:$PAT@github.com/$REPO.git"
 
-          # 🔑 Remote'u DOĞRU formatla override et
+          # 🔑 Remote'u x-access-token formatıyla override et
           git remote remove origin || true
           git remote add origin https://x-access-token:$PAT@github.com/$REPO.git
 
